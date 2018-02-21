@@ -1,0 +1,29 @@
+{
+  "name": "lambo",
+  "version": "1.0.0",
+  "description": "Moon Lambo",
+  "main": "index.js",
+  "scripts": {
+    "start": "babel-node index.js --presets es2015,stage-2",
+    "dev": "nodemon index.js --exec babel-node --presets es2015,stage-2",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pasaji/lambo.git"
+  },
+  "author": "Joonas Pasanen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pasaji/lambo/issues"
+  },
+  "homepage": "https://github.com/pasaji/lambo#readme",
+  "dependencies": {
+    "ccxt": "^1.10.1174"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1"
+  }
+}
