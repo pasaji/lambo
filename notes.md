@@ -1,1 +1,3 @@
+# Notes
+
 - https://electronjs.org/
