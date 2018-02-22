@@ -2,7 +2,7 @@ const { Writable } = require('stream')
 
 class Moon {
 
-  constructor({ id = 'moon', max = 100, min = 50 } = {}) {
+  constructor({ id = 'moon', max = 1000, min = 500 } = {}) {
     this.data = []
     this.max = max
     this.min = min
