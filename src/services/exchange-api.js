@@ -1,8 +1,8 @@
-import ccxt from 'ccxt'
-import { Readable } from 'stream'
-import { DAY, now } from '../utils/time-utils'
+const ccxt = require('ccxt')
+const { Readable } = require('stream')
+const { DAY, now } = require('../utils/time-utils')
 
-export default class ExchangeAPI {
+class ExchangeAPI {
   constructor({ keychain = {} }) {
     this.keychain = keychain
   }
@@ -25,3 +25,5 @@ export default class ExchangeAPI {
     return stream
   }
 }
+
+module.exports = ExchangeAPI

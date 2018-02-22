@@ -19,7 +19,8 @@
   },
   "homepage": "https://github.com/pasaji/lambo#readme",
   "dependencies": {
-    "ccxt": "^1.10.1174"
+    "ccxt": "^1.10.1174",
+    "technicalindicators": "^1.1.4"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

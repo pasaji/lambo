@@ -1,8 +1,8 @@
-import RSI from './indicators/rsi'
-import ExchangeAPI from './services/exchange-api'
-import Moon from './strategies/moon'
+const { RSI } = require('./indicators')
+const { ExchangeAPI } = require('./services')
+const Moon = require('./strategies/moon')
 
-export default class Lambo {
+class Lambo {
   constructor({ keychain = {} }) {
     this.keychain = keychain
   }
@@ -16,11 +16,12 @@ export default class Lambo {
 
     api.readOHLCV({ exchange: 'poloniex', market: 'ETH/USDT' })
       .pipe(rsi)
-      .pipe(moon.writeOHLCV())
-
+      .pipe(moon.writeOHLCV())      
   }
 
   stop() {
     console.log('-- MOON? --')
   }
 }
+
+module.exports = Lambo

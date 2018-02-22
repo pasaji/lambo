@@ -1,7 +1,6 @@
-import ccxt from 'ccxt'
-import { Writable } from 'stream'
+const { Writable } = require('stream')
 
-export default class Moon {
+class Moon {
   constructor(options = {}) {
 
   }
@@ -17,3 +16,5 @@ export default class Moon {
     return stream
   }
 }
+
+module.exports = Moon
