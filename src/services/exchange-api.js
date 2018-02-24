@@ -15,7 +15,7 @@ class ExchangeAPI {
       }
     })
     const e = new ccxt[ exchange ]({ 'timeout': 30000 })
-    e.fetchOHLCV(market, '5m', now() - 2 * WEEK, 99999).then((result) => {
+    e.fetchOHLCV(market, '5m', now() - WEEK, 99999).then((result) => {
       result.forEach((item) => {
         stream.push({ date: item[0], open: item[1], high: item[2], low: item[3], close: item[4], volume: item[5] })
       })

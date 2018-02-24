@@ -20,6 +20,7 @@
   "homepage": "https://github.com/pasaji/lambo#readme",
   "dependencies": {
     "ccxt": "^1.10.1174",
+    "express": "^4.16.2",
     "technicalindicators": "^1.1.4"
   },
   "devDependencies": {
