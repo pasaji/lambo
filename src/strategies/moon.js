@@ -1,11 +1,21 @@
-const { Writable } = require('stream')
+const { Transform } = require('stream')
 
 class Moon {
 
-  constructor({ id = 'moon', max = 1000, min = 500 } = {}) {
-    this.data = []
-    this.max = max
-    this.min = min
+  constructor({
+    id = 'moon',
+    exchange,
+    market,
+    maxData = 1000,
+    minData = 100,
+  } = {}) {
+
+    this.id = id
+    this.exchange = exchange
+    this.market = market
+    this.data = [] // TODO: Create ohlcv store class
+    this.maxData = maxData
+    this.minData = minData
     this.phase = 'buy'
     this.flags = {} // phase notes
     this.balance = {
@@ -16,47 +26,38 @@ class Moon {
 
   addData(item) {
     this.data.push(item)
-    if (this.data.length > this.max) {
+    if (this.data.length > this.maxData) {
       this.data.shift()
-    }
-    if (this.data.length > this.min) {
-      this.analyze()
     }
   }
 
   // TODO: make this dublex, so strategies can be piped
   ohlcv() {
     const self = this
-    const stream = new Writable({
+    const stream = new Transform({
       objectMode: true,
-      write(chunk, encoding, callback) {
-        self.addData(chunk)
-        callback()
+      transform(chunk, encoding, callback) {
+        self.analyze(chunk, callback)
       }
     })
     return stream
   }
 
-  // IDEA: Pitäisikö itemiin liittää buy / sell action mukaan
-  // - helpompi visualisointi
-  // - kamat kulkisi samassa stramissa eteenpäin traderille
-  analyze() {
-    // console.log('analyze');
-
-    const item = this.data[ this.data.length - 1 ]
+  analyze(item, cb) {
+    this.addData(item)
+    if (this.data.length < this.minData) {
+      return cb(null, item)
+    }
 
     const overbought = item.rsi > 70
     //const overbought = item.cci > 200
     const oversold = item.rsi < 30
     // const oversold = item.cci < -200
 
-
     const upperBandOverflow = item.high > item.bb.upper
     const lowerBandOverflow = item.low < item.bb.lower
-    const upTrend = item.adx.pdi > 20 && item.adx.mdi < 20
-    const downTrend = item.adx.mdi > 20 && item.adx.pdi < 20
-
-    const { rsi, cci } = item
+    const upTrend = item.adx.pdi > 30 && item.adx.mdi < 30 && item.adx.adx > 20
+    const downTrend = item.adx.mdi > 30 && item.adx.pdi < 30 && item.adx.adx > 20
 
     // console.log({ rsi, cci, upTrend, downTrend })
 
@@ -76,7 +77,7 @@ class Moon {
     // use ATR as stoploss. Set stoploss at 1 * ATR below buy price
 
     // console.log({ overbought, oversold, upperBandOverflow, lowerBandOverflow })
-
+    /*
     if (overbought && upperBandOverflow && this.phase === 'sell') {
       this.balance.USD = (0.9985 * this.balance.ETH) * item.close
       this.balance.ETH = 0
@@ -92,8 +93,52 @@ class Moon {
       item.action = { type: 'buy' }
       // switch phase
       this.phase = 'sell'
-
     }
+    */
+
+    const d = new Date(item.date)
+    if (this.phase === 'buy') {
+      /*
+      if ( item.macd.MACD > 0 ) {
+        this.buy(item)
+      }
+      */
+      if ( item.emaFast > item.emaSlow) {
+        this.buy(item)
+      }
+    } else if (this.phase === 'sell') {
+      /*
+      if ( item.macd.MACD < 0 ) {
+        this.sell(item)
+      }
+      */
+      if ( item.emaFast < item.emaSlow) {
+        this.sell(item)
+      }
+    }
+    cb(null, item)
+  }
+
+  buy(item) {
+    this.balance.ETH = (0.9985 * this.balance.USD) / item.close
+    this.balance.USD = 0
+
+    // TODO: add action id
+    item.action = { type: 'buy', strategy: this.id, exchange: this.exchange, market: this.market, price: item.close }
+
+    // console.log('BUY', item.close);
+
+    // switch phase
+    this.phase = 'sell'
+  }
+
+  sell(item) {
+    this.balance.USD = (0.9985 * this.balance.ETH) * item.close
+    this.balance.ETH = 0
+    item.action = { type: 'sell', strategy: this.id, exchange: this.exchange, market: this.market, price: item.close }
+    // console.log('SELL', item.close, this.balance.USD+'$', ((100*this.balance.USD/1000)-100)+'%' );
+    // switch phase
+    this.phase = 'buy'
   }
 
   getState() {
