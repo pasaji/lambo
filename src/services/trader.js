@@ -3,7 +3,7 @@ const exchangeSimulator = require('./exchange-simulator');
 
 class Trader {
 
-  constructor({ maxData = 1000 } = {}) {
+  constructor({ maxData = 10000 } = {}) {
     this.maxData = maxData
     this.data = []
   }

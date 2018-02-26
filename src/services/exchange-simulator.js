@@ -9,15 +9,7 @@ class ExchangeSimulator {
   getExchange(id) {
     if (!this.exchanges.hasOwnProperty(id)) {
       this.exchanges[id] = {
-        balance: {
-          /*
-          'BTC':   {           // string, three-letter currency code, uppercase
-              'free': 321.00   // float, money available for trading
-              'used': 234.00,  // float, money on hold, locked, frozen or pending
-              'total': 555.00, // float, total balance (free + used)
-          }
-          */
-        }
+        balance: {}
       }
     }
     return this.exchanges[id];
@@ -55,7 +47,7 @@ class ExchangeSimulator {
       quote.free = quote.total = (0.9985 * base.free) * price
       quote.used = 0
       base.free = base.used = base.total = 0
-      console.log('B - ' + currencies[0] + ': ' + base.total + ', \t\t\t' + currencies[1] + ': ' + quote.total);
+      console.log('S - ' + currencies[0] + ': ' + base.total + ', \t\t\t' + currencies[1] + ': ' + quote.total);
     }
   }
 }

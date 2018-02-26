@@ -203,7 +203,7 @@
           {
             name: 'emaSlow',
             type: 'line',
-            lineStyle: { normal: { color:'#6666ff' } },
+            lineStyle: { normal: { color:'#ff9900' } },
             data: state.data.map(function(item, index) {
               return item.emaSlow
             })
@@ -211,9 +211,17 @@
           {
             name: 'emaFast',
             type: 'line',
-            lineStyle: { normal: { color:'#0000ff' } },
+            lineStyle: { normal: { color:'#aa5555' } },
             data: state.data.map(function(item, index) {
               return item.emaFast
+            })
+          },
+          {
+            name: 'sma',
+            type: 'line',
+            lineStyle: { normal: { color:'#6666ff' } },
+            data: state.data.map(function(item, index) {
+              return item.sma
             })
           },
           {

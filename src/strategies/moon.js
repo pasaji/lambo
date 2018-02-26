@@ -18,10 +18,7 @@ class Moon {
     this.minData = minData
     this.phase = 'buy'
     this.flags = {} // phase notes
-    this.balance = {
-      USD: 1000,
-      ETH: 0
-    }
+    this.traps = []
   }
 
   addData(item) {
@@ -29,6 +26,13 @@ class Moon {
     if (this.data.length > this.maxData) {
       this.data.shift()
     }
+  }
+
+  addTrap(trigger) {
+    this.traps.push(trigger)
+    // trigger
+    // remove
+
   }
 
   // TODO: make this dublex, so strategies can be piped
@@ -49,94 +53,96 @@ class Moon {
       return cb(null, item)
     }
 
-    const overbought = item.rsi > 70 && item.cci > 200
-    //const overbought = item.cci > 200
-    const oversold = item.rsi < 30 && item.cci < -200
-    // const oversold = item.cci < -200
-
+    const overbought = item.cci > 200 && item.rsi > 70
     const upperBandOverflow = item.high > item.bb.upper
+
+    const oversold = item.cci < -200 && item.rsi < 30
     const lowerBandOverflow = item.low < item.bb.lower
+
+    const rangeboundMarket = item.adx.adx <= 20
+    const trendingMarket = item.adx.adx > 20
     const upTrend = item.adx.pdi > 30 && item.adx.mdi < 30 && item.adx.adx > 20
     const downTrend = item.adx.mdi > 30 && item.adx.pdi < 30 && item.adx.adx > 20
 
-    // console.log({ rsi, cci, upTrend, downTrend })
+    const buyRange = item.close < item.vwap - item.atr
+    const sellRange = item.close > item.vwap + item.atr
 
-    // non Trending adx < 20
 
-    // Calculate risk award ratio. better reward = higher risk can be taken
+    // TODO: Calculate risk award ratio. better reward = higher risk can be taken
+    // TODO: use ATR as stoploss. Set stoploss at 1 * ATR below buy price
 
-    // rangeboundMarket or trendingMarket
+    if (this.traps.length) {
+      for (let i = 0; i < this.traps.length; i++) {
+        const action = this.traps[i](item)
+        if (action === 'buy') {
+          this.buy(item)
+          // add stoploss
+        }
+        if (action === 'sell') {
 
-    // Ideas:
-    // 1. RSI (overbought/oversold)
-    // (2. BB overflow)
-    // 3. MACD turns (down/up)
-    // MACD flippaa myöhemmin joka parempi merkki myynti/osto hetkelle
-    // https://www.youtube.com/watch?v=C-770uuFILM
-
-    // use ATR as stoploss. Set stoploss at 1 * ATR below buy price
-
-    // console.log({ overbought, oversold, upperBandOverflow, lowerBandOverflow })
-    /*
-    if (overbought && upperBandOverflow && this.phase === 'sell') {
-      this.balance.USD = (0.9985 * this.balance.ETH) * item.close
-      this.balance.ETH = 0
-      console.log('SELL', item.close, this.balance.USD+'$', ((100*this.balance.USD/1000)-100)+'%' );
-      item.action = { type: 'sell' }
-
-      // switch phase
-      this.phase = 'buy'
-    } else if (oversold && lowerBandOverflow && this.phase === 'buy') {
-      console.log('BUY', item.close);
-      this.balance.ETH = (0.9985 * this.balance.USD) / item.close
-      this.balance.USD = 0
-      item.action = { type: 'buy' }
-      // switch phase
-      this.phase = 'sell'
+          this.sell(item)
+        }
+        if (action === 'cancel') {
+          // TODO: remove trap
+        }
+      }
     }
-    */
 
-    const d = new Date(item.date)
+    const self = this
+
     if (this.phase === 'buy') {
-      /*
-      if ( item.macd.MACD > 0 ) {
-        this.buy(item)
+      if (oversold && lowerBandOverflow && buyRange) {
+        this.addTrap((i) => {
+          if (i.cci > -60) {
+            return 'buy'
+          }
+          // todo: cancel
+          return null
+        })
       }
-      */
-      if (oversold) {
-        this.buy(item)
-      }
-    } else if (this.phase === 'sell') {
-      /*
-      if ( item.macd.MACD < 0 ) {
-        this.sell(item)
-      }
-      */
-      if (overbought) {
-        this.sell(item)
+    } else if (this.phase === 'sell' && sellRange) {
+      if (item.macd.MACD < 0) {
+        this.addTrap((i) => {
+          if (i.cci < 60 && i.adx.adx < 30) {
+            return 'sell'
+          }
+          // todo: cancel
+          return null
+        })
       }
     }
     cb(null, item)
   }
 
   buy(item) {
-    this.balance.ETH = (0.9985 * this.balance.USD) / item.close
-    this.balance.USD = 0
-
     // TODO: add action id
     item.action = { type: 'buy', strategy: this.id, exchange: this.exchange, market: this.market, price: item.close }
-
-    // console.log('BUY', item.close);
-
+    this.traps = [] // clear traps
+    // add stop loss
+    const stopLossPrice = item.close - item.atr * 1.5
+    this.addTrap((i) => {
+      if (i.close  < stopLossPrice) {
+        //return 'sell'
+      }
+      // todo: cancel
+      return null
+    })
     // switch phase
     this.phase = 'sell'
   }
 
   sell(item) {
-    this.balance.USD = (0.9985 * this.balance.ETH) * item.close
-    this.balance.ETH = 0
     item.action = { type: 'sell', strategy: this.id, exchange: this.exchange, market: this.market, price: item.close }
-    // console.log('SELL', item.close, this.balance.USD+'$', ((100*this.balance.USD/1000)-100)+'%' );
+    this.traps = []
+    // add stop loss
+    const stopLossPrice = item.close + item.atr * 1.5
+    this.addTrap((i) => {
+      if (i.close  > stopLossPrice) {
+        //return 'buy'
+      }
+      // todo: cancel
+      return null
+    })
     // switch phase
     this.phase = 'buy'
   }

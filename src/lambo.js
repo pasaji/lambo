@@ -17,7 +17,7 @@ class Lambo {
     // indicators
     const rsi = new RSI()
     const cci = new CCI()
-    const sma = new SMA()
+    const sma = new SMA({ period: 300 })
     const ema21 = new EMA({ period: 21, suffix: 'Slow' })
     const ema9 = new EMA({ period: 9, suffix: 'Fast' })
     const bb = new BB()
