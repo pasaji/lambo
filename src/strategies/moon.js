@@ -49,9 +49,9 @@ class Moon {
       return cb(null, item)
     }
 
-    const overbought = item.rsi > 70
+    const overbought = item.rsi > 70 && item.cci > 200
     //const overbought = item.cci > 200
-    const oversold = item.rsi < 30
+    const oversold = item.rsi < 30 && item.cci < -200
     // const oversold = item.cci < -200
 
     const upperBandOverflow = item.high > item.bb.upper
@@ -103,7 +103,7 @@ class Moon {
         this.buy(item)
       }
       */
-      if ( item.emaFast > item.emaSlow) {
+      if (oversold) {
         this.buy(item)
       }
     } else if (this.phase === 'sell') {
@@ -112,7 +112,7 @@ class Moon {
         this.sell(item)
       }
       */
-      if ( item.emaFast < item.emaSlow) {
+      if (overbought) {
         this.sell(item)
       }
     }

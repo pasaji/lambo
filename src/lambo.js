@@ -18,11 +18,11 @@ class Lambo {
     const rsi = new RSI()
     const cci = new CCI()
     const sma = new SMA()
-    const ema21 = new EMA({ period: 40, suffix: 'Slow' })
-    const ema9 = new EMA({ period: 20, suffix: 'Fast' })
-    const bb = new BB({ period: 9 })
+    const ema21 = new EMA({ period: 21, suffix: 'Slow' })
+    const ema9 = new EMA({ period: 9, suffix: 'Fast' })
+    const bb = new BB()
     const macd = new MACD()
-    const adx = new ADX({period:50})
+    const adx = new ADX()
     const vwap = new VWAP()
     const atr = new ATR()
     const fi = new FI()
@@ -30,7 +30,7 @@ class Lambo {
     // strategy
     const moon = new Moon({ exchange: 'poloniex', market: 'ETH/USDT' })
 
-    exchangeSimulator.deposit('poloniex', 'USDT', 10000)
+    exchangeSimulator.deposit('poloniex', 'USDT', 1000)
 
     api.readOHLCV({ exchange: 'poloniex', market: 'ETH/USDT' })
       .pipe(rsi)
