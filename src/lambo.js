@@ -1,10 +1,12 @@
-const { RSI, SMA, EMA, BB } = require('./indicators')
-const { ExchangeAPI } = require('./services')
+const { RSI, CCI, SMA, EMA, BB, ADX, MACD, VWAP, ATR, FI } = require('./indicators')
+const { ExchangeAPI, Trader, exchangeSimulator } = require('./services')
 const Moon = require('./strategies/moon')
+
 
 class Lambo {
   constructor({ keychain = {} }) {
     this.keychain = keychain
+    this.trader = new Trader()
   }
 
   start() {
@@ -12,25 +14,46 @@ class Lambo {
 
     const api = new ExchangeAPI({ keychain: this.keychain })
 
+    // indicators
     const rsi = new RSI()
+    const cci = new CCI()
     const sma = new SMA()
-    const ema21 = new EMA({ period: 21, suffix: 'Slow' })
-    const ema9 = new EMA({ period: 9, suffix: 'Fast' })
+    const ema21 = new EMA({ period: 40, suffix: 'Slow' })
+    const ema9 = new EMA({ period: 20, suffix: 'Fast' })
     const bb = new BB({ period: 9 })
+    const macd = new MACD()
+    const adx = new ADX({period:50})
+    const vwap = new VWAP()
+    const atr = new ATR()
+    const fi = new FI()
 
-    const moon = new Moon()
+    // strategy
+    const moon = new Moon({ exchange: 'poloniex', market: 'ETH/USDT' })
+
+    exchangeSimulator.deposit('poloniex', 'USDT', 10000)
 
     api.readOHLCV({ exchange: 'poloniex', market: 'ETH/USDT' })
       .pipe(rsi)
+      .pipe(cci)
       .pipe(sma)
       .pipe(ema21)
       .pipe(ema9)
       .pipe(bb)
+      .pipe(macd)
+      .pipe(adx)
+      .pipe(vwap)
+      .pipe(atr)
+      .pipe(fi)
       .pipe(moon.ohlcv())
+      .pipe(this.trader.ohlcv())
   }
 
   stop() {
     console.log('-- MOON? --')
+  }
+
+  getState() {
+    return this.trader.getState()
   }
 }
 
