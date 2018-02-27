@@ -1,6 +1,8 @@
 const { RSI, CCI, SMA, EMA, BB, ADX, MACD, VWAP, ATR, FI } = require('./indicators')
 const { ExchangeAPI, Trader, exchangeSimulator } = require('./services')
+
 const Moon = require('./strategies/moon')
+const Mars = require('./strategies/mars')
 
 
 class Lambo {
@@ -29,6 +31,7 @@ class Lambo {
 
     // strategy
     const moon = new Moon({ exchange: 'poloniex', market: 'ETH/USDT' })
+    const mars = new Mars({ exchange: 'poloniex', market: 'ETH/USDT' })
 
     exchangeSimulator.deposit('poloniex', 'USDT', 1000)
 
@@ -44,7 +47,8 @@ class Lambo {
       .pipe(vwap)
       .pipe(atr)
       .pipe(fi)
-      .pipe(moon.ohlcv())
+      // .pipe(moon.ohlcv())
+      .pipe(mars.ohlcv())
       .pipe(this.trader.ohlcv())
   }
 

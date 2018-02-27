@@ -68,7 +68,7 @@ class Moon {
     const sellRange = item.close > item.vwap + item.atr
 
 
-    // TODO: Calculate risk award ratio. better reward = higher risk can be taken
+    // TODO: Calculate risk award ratio. better reward = higher risk can be taken --> Fibonacci Retracements ?
     // TODO: use ATR as stoploss. Set stoploss at 1 * ATR below buy price
 
     if (this.traps.length) {
