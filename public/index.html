@@ -154,7 +154,7 @@
             type: 'slider',
             xAxisIndex: [0,1,2,3,4],
             filterMode: 'filter',
-            start: 75,
+            start: 0,
             end: 100
           },
           {
@@ -222,6 +222,62 @@
             lineStyle: { normal: { color:'#6666ff' } },
             data: state.data.map(function(item, index) {
               return item.sma
+            })
+          },
+          {
+            name: 'fr.high',
+            type: 'line',
+            lineStyle: { normal: { color:'#dddddd' } },
+            data: state.data.map(function(item, index) {
+              return item.fr.high
+            })
+          },
+          {
+            name: 'fr.level5',
+            type: 'line',
+            lineStyle: { normal: { color:'#dddddd' } },
+            data: state.data.map(function(item, index) {
+              return item.fr.level5
+            })
+          },
+          {
+            name: 'fr.level4',
+            type: 'line',
+            lineStyle: { normal: { color:'#dddddd' } },
+            data: state.data.map(function(item, index) {
+              return item.fr.level4
+            })
+          },
+          {
+            name: 'fr.level3',
+            type: 'line',
+            lineStyle: { normal: { color:'#dddddd' } },
+            data: state.data.map(function(item, index) {
+              return item.fr.level3
+            })
+          },
+          {
+            name: 'fr.level2',
+            type: 'line',
+            lineStyle: { normal: { color:'#dddddd' } },
+            data: state.data.map(function(item, index) {
+              return item.fr.level2
+            })
+          },
+          {
+            name: 'fr.level1',
+            type: 'line',
+            lineStyle: { normal: { color:'#dddddd' } },
+            data: state.data.map(function(item, index) {
+              return item.fr.level1
+            })
+          },
+          {
+            name: 'fr.low',
+            type: 'line',
+            lineStyle: { normal: { color:'#dddddd' } },
+            data: state.data.map(function(item, index) {
+              return item.fr.low
             })
           },
           {
